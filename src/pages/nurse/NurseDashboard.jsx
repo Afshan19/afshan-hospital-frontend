@@ -26,7 +26,6 @@ const NurseDashboard = ({ onLogout, navigateTo }) => {
     { label: "Today's Queue", icon: '📋', route: 'nurse-queue' },
     { label: 'Patient Check-in', icon: '✅', route: 'nurse-checkin' },
     { label: 'Patient Information', icon: '👤', route: 'nurse-info' },
-    { label: 'Queue Management', icon: '⚙️', route: 'nurse-queue-mgmt' },
   ];
 
   return (

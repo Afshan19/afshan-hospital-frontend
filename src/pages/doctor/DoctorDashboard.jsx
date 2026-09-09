@@ -30,12 +30,8 @@ const DoctorDashboard = ({ onLogout, navigateTo }) => {
   const doctorMenu = [
     { label: 'Dashboard / Overview', icon: '📊', route: 'doctor-overview' },
     { label: 'My Appointments', icon: '📅', route: 'doctor-appointments' },
-    { label: "Today's Queue", icon: '📋', route: 'doctor-queue' },
     { label: 'Patients', icon: '👥', route: 'doctor-patients' },
-    { label: 'Patient Medical Records', icon: '📁', route: 'doctor-medical-records' },
-    { label: 'Clinical Notes', icon: '📝', route: 'doctor-notes' },
     { label: 'Prescriptions', icon: '💊', route: 'doctor-prescriptions' },
-    { label: 'Lab Reports', icon: '🧪', route: 'doctor-labs' },
     { label: 'My Availability', icon: '🕒', route: 'doctor-availability' },
   ];
 
@@ -83,7 +79,6 @@ const DoctorDashboard = ({ onLogout, navigateTo }) => {
             <div className="stat-card"><h3>{stats.patients}</h3><p>Total Patients</p></div>
             <div className="stat-card"><h3>{stats.appointments}</h3><p>Appointments</p></div>
             <div className="stat-card"><h3>{stats.prescriptions}</h3><p>Prescriptions</p></div>
-            <div className="stat-card"><h3>{stats.labs}</h3><p>Lab Reports</p></div>
           </div>
 
           <div className="empty-state">

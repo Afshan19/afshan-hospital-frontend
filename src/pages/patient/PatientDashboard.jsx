@@ -11,11 +11,8 @@ const PatientDashboard = ({ onLogout, navigateTo, userName }) => {
     { label: 'MyProfile', icon: '👤', route: 'patient-profile' },
     { label: 'BookAppointment', icon: '📅', route: 'patient-book' },
     { label: 'MyAppointments', icon: '🗓️', route: 'patient-appointments' },
-    { label: 'MedicalRecords', icon: '📁', route: 'patient-records' },
-    { label: 'Prescriptions', icon: '💊', route: 'patient-prescriptions' },
-    { label: 'LabReports', icon: '🔬', route: 'patient-labs' },
+
     { label: 'MyInvoices', icon: '💰', route: 'patient-invoices' },
-    { label: 'Notifications', icon: '🔔', route: 'patient-notifications' },
   ];
 
   useEffect(() => {

@@ -34,8 +34,7 @@ const AdminDashboard = ({ onLogout, navigateTo }) => {
     { label: 'Manage Patients', icon: '🛌', route: 'admin-patients' },
     { label: 'Manage Specialties', icon: '🏷️', route: 'admin-specialties' },
     { label: 'Appointments', icon: '📅', route: 'admin-appointments' },
-    { label: 'Billing', icon: '💰', route: 'admin-billing' },
-    { label: 'Audit Logs', icon: '📜', route: 'admin-logs' },
+
     { label: 'Reports / Analytics', icon: '📈', route: 'admin-reports' },
   ];
 
