@@ -21,7 +21,6 @@ import NurseDashboard from './pages/nurse/NurseDashboard';
 import TodaysQueue from './pages/nurse/TodaysQueue';
 import PatientCheckIn from './pages/nurse/PatientCheckIn';
 import PatientInformation from './pages/nurse/PatientInformation';
-import QueueManagement from './pages/nurse/QueueManagement';
 
 // Admin Module
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -36,9 +35,7 @@ import ReportsAnalytics from './pages/admin/ReportsAnalytics';
 // Doctor Module
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
 import DoctorMyAppointments from './pages/doctor/MyAppointments';
-import DoctorTodaysQueue from './pages/doctor/TodaysQueue';
 import DoctorPatients from './pages/doctor/Patients';
-import DoctorMedicalRecords from './pages/doctor/PatientMedicalRecords';
 import DoctorPrescriptions from './pages/doctor/Prescriptions';
 import DoctorMyAvailability from './pages/doctor/MyAvailability';
 // import DoctorMyAvailability from './pages/doctor/MyAvailability'; // COMMENTED
