@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import DashboardLayout from './components/DashboardLayout';
 
 // Basic Screens
 import HomeScreen from './pages/Home';
 import LoginScreen from './pages/login';
 import RegisterScreen from './pages/Register';
-
-// 5 Kept Modules (Header wale)
-import PharmacyScreen from './pages/Pharmacy';
-import LaboratoryScreen from './pages/Laboratory';
-import WardsScreen from './pages/Wards';
-import AmbulanceScreen from './pages/Ambulance';
-import SettingsScreen from './pages/Settings';
 
 // Patient Module
 import PatientDashboard from './pages/patient/PatientDashboard';
@@ -28,7 +22,6 @@ import NurseDashboard from './pages/nurse/NurseDashboard';
 import TodaysQueue from './pages/nurse/TodaysQueue';
 import PatientCheckIn from './pages/nurse/PatientCheckIn';
 import PatientInformation from './pages/nurse/PatientInformation';
-import QueueManagement from './pages/nurse/QueueManagement';
 
 // Admin Module
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -37,8 +30,6 @@ import ManageDoctors from './pages/admin/ManageDoctors';
 import ManagePatients from './pages/admin/ManagePatients';
 import ManageSpecialties from './pages/admin/ManageSpecialties';
 import AdminAppointments from './pages/admin/Appointments';
-import AdminBilling from './pages/admin/Billing';
-import AuditLogs from './pages/admin/AuditLogs';
 import ReportsAnalytics from './pages/admin/ReportsAnalytics';
 
 // Doctor Module
@@ -47,9 +38,7 @@ import DoctorMyAppointments from './pages/doctor/MyAppointments';
 import DoctorTodaysQueue from './pages/doctor/TodaysQueue';
 import DoctorPatients from './pages/doctor/Patients';
 import DoctorMedicalRecords from './pages/doctor/PatientMedicalRecords';
-import DoctorClinicalNotes from './pages/doctor/ClinicalNotes';
 import DoctorPrescriptions from './pages/doctor/Prescriptions';
-import DoctorLabReports from './pages/doctor/LabReports';
 import DoctorMyAvailability from './pages/doctor/MyAvailability';
 
 // Receptionist Module
@@ -63,30 +52,26 @@ import ReceptionistBilling from './pages/receptionist/Billing';
 
 function App() {
   const [page, setPage] = useState('home');
-  const [isLoading, setIsLoading] = useState(true); // Loader State
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Login Check
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
-
     setIsLoading(true);
     const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, [page]);
 
-  // Role-Based Login (Token store karo)
   const handleLogin = (role) => {
-    localStorage.setItem('token', 'logged_in_token'); // Fake token for demo
+    localStorage.setItem('token', 'logged_in_token');
     setIsLoggedIn(true);
-    
     if (role === 'Patient') setPage('patient-overview');
     else if (role === 'Nurse') setPage('nurse-overview');
     else if (role === 'Doctor') setPage('doctor-overview');
     else if (role === 'Admin') setPage('admin-overview');
     else if (role === 'Receptionist') setPage('receptionist-overview');
-    else setPage('dashboard'); // Fallback
+    else setPage('dashboard');
   };
 
   const handleLogout = () => {
@@ -97,7 +82,14 @@ function App() {
 
   const navigateTo = (screen) => setPage(screen);
 
-  // Loader UI
+  const renderDashboard = (role, activeRoute, Component, extraProps = {}) => {
+    return (
+      <DashboardLayout role={role} activeRoute={activeRoute} navigateTo={navigateTo} onLogout={handleLogout}>
+        <Component navigateTo={navigateTo} {...extraProps} />
+      </DashboardLayout>
+    );
+  };
+
   if (isLoading) {
     return (
       <>
@@ -111,73 +103,54 @@ function App() {
     );
   }
 
-  // ** IMPORTANT: Access Rule **
-  const protectedPages = ['pharmacy', 'laboratory', 'wards', 'ambulance', 'settings'];
-  if (protectedPages.includes(page) && !isLoggedIn) {
-    return <LoginScreen onLogin={handleLogin} navigateTo={navigateTo} />;
-  }
-
-  // Routing Logic
+  // Routing
   if (page === 'home') return <HomeScreen navigateTo={navigateTo} />;
   if (page === 'login') return <LoginScreen onLogin={handleLogin} navigateTo={navigateTo} />;
   if (page === 'register') return <RegisterScreen navigateTo={navigateTo} />;
 
-  // 5 Kept Modules Routes
-  if (page === 'pharmacy') return <PharmacyScreen navigateTo={navigateTo} />;
-  if (page === 'laboratory') return <LaboratoryScreen navigateTo={navigateTo} />;
-  if (page === 'wards') return <WardsScreen navigateTo={navigateTo} />;
-  if (page === 'ambulance') return <AmbulanceScreen navigateTo={navigateTo} />;
-  if (page === 'settings') return <SettingsScreen navigateTo={navigateTo} />;
+  // Patient
+  if (page === 'patient-overview') return renderDashboard('Patient', page, PatientDashboard, { userName: localStorage.getItem('userName') || 'Patient' });
+  if (page === 'patient-profile') return renderDashboard('Patient', page, MyProfile);
+  if (page === 'patient-book') return renderDashboard('Patient', page, BookAppointment);
+  if (page === 'patient-appointments') return renderDashboard('Patient', page, MyAppointments);
+  if (page === 'patient-records') return renderDashboard('Patient', page, MedicalRecords);
+  if (page === 'patient-prescriptions') return renderDashboard('Patient', page, Prescriptions);
+  if (page === 'patient-labs') return renderDashboard('Patient', page, LabReports);
+  if (page === 'patient-invoices') return renderDashboard('Patient', page, MyInvoices);
+  if (page === 'patient-notifications') return renderDashboard('Patient', page, Notifications);
 
-  // Patient Routes
-  // ** Yahan userName pass kiya ja raha hai **
-  if (page === 'patient-overview') return <PatientDashboard onLogout={handleLogout} navigateTo={navigateTo} userName={localStorage.getItem('userName') || 'Patient'} />;
-  if (page === 'patient-profile') return <MyProfile navigateTo={navigateTo} />;
-  if (page === 'patient-book') return <BookAppointment navigateTo={navigateTo} />;
-  if (page === 'patient-appointments') return <MyAppointments navigateTo={navigateTo} />;
-  if (page === 'patient-records') return <MedicalRecords navigateTo={navigateTo} />;
-  if (page === 'patient-prescriptions') return <Prescriptions navigateTo={navigateTo} />;
-  if (page === 'patient-labs') return <LabReports navigateTo={navigateTo} />;
-  if (page === 'patient-invoices') return <MyInvoices navigateTo={navigateTo} />;
-  if (page === 'patient-notifications') return <Notifications navigateTo={navigateTo} />;
+  // Nurse
+  if (page === 'nurse-overview') return renderDashboard('Nurse', page, NurseDashboard);
+  if (page === 'nurse-queue') return renderDashboard('Nurse', page, TodaysQueue);
+  if (page === 'nurse-checkin') return renderDashboard('Nurse', page, PatientCheckIn);
+  if (page === 'nurse-info') return renderDashboard('Nurse', page, PatientInformation);
 
-  // Nurse Routes
-  if (page === 'nurse-overview') return <NurseDashboard onLogout={handleLogout} navigateTo={navigateTo} />;
-  if (page === 'nurse-queue') return <TodaysQueue navigateTo={navigateTo} />;
-  if (page === 'nurse-checkin') return <PatientCheckIn navigateTo={navigateTo} />;
-  if (page === 'nurse-info') return <PatientInformation navigateTo={navigateTo} />;
-  if (page === 'nurse-queue-mgmt') return <QueueManagement navigateTo={navigateTo} />;
+  // Admin
+  if (page === 'admin-overview') return renderDashboard('Admin', page, AdminDashboard);
+  if (page === 'admin-users') return renderDashboard('Admin', page, ManageUsers);
+  if (page === 'admin-doctors') return renderDashboard('Admin', page, ManageDoctors);
+  if (page === 'admin-patients') return renderDashboard('Admin', page, ManagePatients);
+  if (page === 'admin-specialties') return renderDashboard('Admin', page, ManageSpecialties);
+  if (page === 'admin-appointments') return renderDashboard('Admin', page, AdminAppointments);
+  if (page === 'admin-reports') return renderDashboard('Admin', page, ReportsAnalytics);
 
-  // Admin Routes
-  if (page === 'admin-overview') return <AdminDashboard onLogout={handleLogout} navigateTo={navigateTo} />;
-  if (page === 'admin-users') return <ManageUsers navigateTo={navigateTo} />;
-  if (page === 'admin-doctors') return <ManageDoctors navigateTo={navigateTo} />;
-  if (page === 'admin-patients') return <ManagePatients navigateTo={navigateTo} />;
-  if (page === 'admin-specialties') return <ManageSpecialties navigateTo={navigateTo} />;
-  if (page === 'admin-appointments') return <AdminAppointments navigateTo={navigateTo} />;
-  if (page === 'admin-billing') return <AdminBilling navigateTo={navigateTo} />;
-  if (page === 'admin-logs') return <AuditLogs navigateTo={navigateTo} />;
-  if (page === 'admin-reports') return <ReportsAnalytics navigateTo={navigateTo} />;
+  // Doctor
+  if (page === 'doctor-overview') return renderDashboard('Doctor', page, DoctorDashboard);
+  if (page === 'doctor-appointments') return renderDashboard('Doctor', page, DoctorMyAppointments);
+  if (page === 'doctor-queue') return renderDashboard('Doctor', page, DoctorTodaysQueue);
+  if (page === 'doctor-patients') return renderDashboard('Doctor', page, DoctorPatients);
+  if (page === 'doctor-medical-records') return renderDashboard('Doctor', page, DoctorMedicalRecords);
+  if (page === 'doctor-prescriptions') return renderDashboard('Doctor', page, DoctorPrescriptions);
+  if (page === 'doctor-availability') return renderDashboard('Doctor', page, DoctorMyAvailability);
 
-  // Doctor Routes
-  if (page === 'doctor-overview') return <DoctorDashboard onLogout={handleLogout} navigateTo={navigateTo} />;
-  if (page === 'doctor-appointments') return <DoctorMyAppointments navigateTo={navigateTo} />;
-  if (page === 'doctor-queue') return <DoctorTodaysQueue navigateTo={navigateTo} />;
-  if (page === 'doctor-patients') return <DoctorPatients navigateTo={navigateTo} />;
-  if (page === 'doctor-medical-records') return <DoctorMedicalRecords navigateTo={navigateTo} />;
-  if (page === 'doctor-notes') return <DoctorClinicalNotes navigateTo={navigateTo} />;
-  if (page === 'doctor-prescriptions') return <DoctorPrescriptions navigateTo={navigateTo} />;
-  if (page === 'doctor-labs') return <DoctorLabReports navigateTo={navigateTo} />;
-  if (page === 'doctor-availability') return <DoctorMyAvailability navigateTo={navigateTo} />;
-
-  // Receptionist Routes
-  if (page === 'receptionist-overview') return <ReceptionistDashboard onLogout={handleLogout} navigateTo={navigateTo} />;
-  if (page === 'receptionist-register') return <ReceptionistRegisterPatient navigateTo={navigateTo} />;
-  if (page === 'receptionist-patients') return <ReceptionistPatients navigateTo={navigateTo} />;
-  if (page === 'receptionist-book') return <ReceptionistBookAppointment navigateTo={navigateTo} />;
-  if (page === 'receptionist-appointments') return <ReceptionistAppointments navigateTo={navigateTo} />;
-  if (page === 'receptionist-checkin') return <ReceptionistCheckIn navigateTo={navigateTo} />;
-  if (page === 'receptionist-billing') return <ReceptionistBilling navigateTo={navigateTo} />;
+  // Receptionist
+  if (page === 'receptionist-overview') return renderDashboard('Receptionist', page, ReceptionistDashboard);
+  if (page === 'receptionist-register') return renderDashboard('Receptionist', page, ReceptionistRegisterPatient);
+  if (page === 'receptionist-patients') return renderDashboard('Receptionist', page, ReceptionistPatients);
+  if (page === 'receptionist-book') return renderDashboard('Receptionist', page, ReceptionistBookAppointment);
+  if (page === 'receptionist-appointments') return renderDashboard('Receptionist', page, ReceptionistAppointments);
+  if (page === 'receptionist-checkin') return renderDashboard('Receptionist', page, ReceptionistCheckIn);
+  if (page === 'receptionist-billing') return renderDashboard('Receptionist', page, ReceptionistBilling);
 
   return <div>404 Not Found</div>;
 }

@@ -25,19 +25,25 @@ const Notifications = ({ navigateTo }) => {
   return (
     <>
       <style>{`
-        * { font-family: 'Segoe UI', sans-serif; }
-        .wrapper { padding: 20px; background: #f4f6f9; min-height: 100vh; }
-        h1 { margin-bottom: 20px; color: #333; }
-        .back-btn { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
-        .list { background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .item { padding: 15px; border-bottom: 1px solid #eee; }
-        .empty { text-align: center; padding: 40px; color: #888; }
+        * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+        .wrapper { padding: 30px; max-width: 1000px; margin: 0 auto; background: #f8fafc; min-height: 100vh; }
+        .back-btn { background: #e2e8f0; color: #1e293b; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; margin-bottom: 25px; }
+        .back-btn:hover { background: #cbd5e1; transform: translateX(-3px); }
+        h1 { color: #0f172a; font-size: 28px; font-weight: 700; margin-bottom: 25px; }
+        .list { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; overflow: hidden; }
+        .item { padding: 18px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+        .item:last-child { border-bottom: none; }
+        .item:hover { background: #f8fafc; }
+        .item-badge { width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; flex-shrink: 0; }
+        .item-read { background: #e2e8f0; }
+        .empty { text-align: center; padding: 50px; color: #94a3b8; font-size: 16px; }
+        @media (max-width: 600px) { .wrapper { padding: 15px; } .item { padding: 12px 15px; font-size: 14px; } }
       `}</style>
       <div className="wrapper">
-        <button className="back-btn" onClick={() => navigateTo('patient-overview')}>Back to Dashboard</button>
+        <button className="back-btn" onClick={() => navigateTo('patient-overview')}>← Back to Dashboard</button>
         <h1>Notifications</h1>
         <div className="list">
-          {loading ? <div className="empty">Loading...</div> : notifications.length === 0 ? <div className="empty">You have no new notifications.</div> : notifications.map((d, i) => <div className="item" key={i}>{d.message}</div>)}
+          {loading ? <div className="empty">Loading...</div> : notifications.length === 0 ? <div className="empty">You have no new notifications.</div> : notifications.map((d, i) => <div className="item" key={i}><span className="item-badge"></span>{d.message}</div>)}
         </div>
       </div>
     </>

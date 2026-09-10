@@ -1,3 +1,4 @@
+// RegisterScreen.js
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
@@ -130,7 +131,6 @@ const RegisterScreen = ({ navigateTo }) => {
               <label>Role</label>
               <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})}>
                 <option>Patient</option>
-                <option>Admin</option>
                 <option>Doctor</option>
                 <option>Nurse</option>
                 <option>Receptionist</option>
