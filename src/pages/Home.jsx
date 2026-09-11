@@ -6,12 +6,11 @@ const HomeScreen = ({ navigateTo }) => {
   const faqs = [
     { q: "What are the hospital visiting hours?", a: "Our visiting hours are from 9:00 AM to 9:00 PM. The emergency ward is open 24/7." },
     { q: "How can I book an appointment?", a: "You can book an appointment by logging into your account and selecting the Appointments section." },
-    { q: "Do you accept insurance?", a: "Yes, we accept all major insurance companies. Details are available in the Billing section." },
     { q: "Can I get my reports online?", a: "Yes, after logging in, you can download your reports from the Medical Records section." },
     { q: "How can I contact the hospital for emergencies?", a: "For any emergency, please call us immediately at 03181485676 or email us at afshanahmed@548gmail.com. Our team is available 24/7." },
   ];
 
-  // Service data (5 cards now)
+  // Service data (6 cards now)
   const services = [
     {
       icon: "💊",
@@ -39,11 +38,17 @@ const HomeScreen = ({ navigateTo }) => {
       emergency: true
     },
     {
-      icon: "📞",
-      title: "Contact Us",
-      description: "Get in touch with us for appointments, inquiries, or any assistance. Our dedicated support team is here to help you.",
-      features: ["📱 Phone: 03181485676", "📧 Email: afshanahmed@548gmail.com", "📍 Location: Main Hospital Road", "🕒 24/7 Support"],
-      contact: true
+      icon: "🚨",
+      title: "Emergency Services",
+      description: "Round-the-clock emergency care with trained medical staff, modern life-support equipment, and rapid response teams. We are always ready when you need us most.",
+      features: ["24/7 Emergency Ward", "Trained Paramedics", "Life-Support Equipment", "Quick Response Time"],
+      emergency: true
+    },
+    {
+      icon: "📝",
+      title: "Complaints & Feedback",
+      description: "We value your opinion. Share your complaints, suggestions, or feedback to help us improve our services. Every voice matters — we listen and act.",
+      features: ["24/7 Online Submission", "Anonymous Option Available", "Quick Resolution", "Track Your Complaint Status"]
     }
   ];
 
@@ -154,7 +159,7 @@ const HomeScreen = ({ navigateTo }) => {
         </div>
       </div>
 
-      {/* Services Section (5 cards) */}
+      {/* Services Section (6 cards) */}
       <div className="services-section">
         <div className="services-header">
           <h2>Our Services</h2>

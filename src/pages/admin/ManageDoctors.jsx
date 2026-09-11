@@ -27,8 +27,7 @@ const ManageDoctors = ({ navigateTo }) => {
     if (Object.keys(errs).length === 0) {
       setLoading(true);
       try {
-        await addDoc(collection(db, 'doctors'), { ...form, createdAt: new Date() });
-        setDoctors([...doctors, { id: Date.now(), ...form }]);
+await addDoc(collection(db, 'doctors'), { ...form, status: 'Approved', createdAt: new Date() });        setDoctors([...doctors, { id: Date.now(), ...form }]);
         setForm({ name: '', spec: '' });
       } catch (error) { alert("Error adding doctor: " + error.message); }
       finally { setLoading(false); }

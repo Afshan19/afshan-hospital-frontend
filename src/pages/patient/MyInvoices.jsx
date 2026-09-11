@@ -44,7 +44,32 @@ const MyInvoices = ({ navigateTo }) => {
         <button className="back-btn" onClick={() => navigateTo('patient-overview')}>← Back to Dashboard</button>
         <h1>My Invoices / Bills</h1>
         <div className="table">
-          {loading ? <div className="empty">Loading...</div> : invoices.length === 0 ? <div className="empty">No bills generated.</div> : <table><thead><tr><th>Invoice #</th><th>Amount</th><th>Status</th></tr></thead><tbody>{invoices.map((d) => <tr key={d.id}><td><strong>#{d.id}</strong></td><td>${d.amount}</td><td className={d.status === 'Unpaid' ? 'status-unpaid' : 'status-paid'}>{d.status}</td></tr>)}</tbody></table>}
+          {loading ? (
+            <div className="empty">Loading...</div>
+          ) : invoices.length === 0 ? (
+            <div className="empty">No bills generated yet.</div>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoices.map((d, i) => (
+                  <tr key={d.id}>
+                    <td><strong>#{i + 1}</strong></td>
+                    <td>${d.amount}</td>
+                    <td>{d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString() : '—'}</td>
+                    <td className={d.status === 'Unpaid' ? 'status-unpaid' : 'status-paid'}>{d.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </>

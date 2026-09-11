@@ -3,11 +3,26 @@ import { db } from '../../firebase';
 import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
 
 const ReceptionistBilling = ({ navigateTo }) => {
-  const [form, setForm] = useState({ patient: '', amount: '' });
+  const [form, setForm] = useState({ patientId: '', amount: '' });
+  const [patients, setPatients] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // Fetch patients for the dropdown
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'patients'));
+        setPatients(snap.docs.map(d => ({ docId: d.id, ...d.data() })));
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+      }
+    };
+    fetchPatients();
+  }, []);
+
+  // Fetch invoices for the table
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
@@ -21,16 +36,30 @@ const ReceptionistBilling = ({ navigateTo }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let errs = {};
-    if (!form.patient) errs.patient = "Patient name is required";
+    if (!form.patientId) errs.patientId = "Patient is required";
     if (!form.amount) errs.amount = "Amount is required";
     else if (isNaN(form.amount) || Number(form.amount) <= 0) errs.amount = "Amount must be positive";
     setErrors(errs);
+
     if (Object.keys(errs).length === 0) {
       setLoading(true);
       try {
-        await addDoc(collection(db, 'invoices'), { ...form, status: 'Unpaid', createdAt: serverTimestamp() });
-        setInvoices([...invoices, { id: Date.now(), ...form, status: 'Unpaid' }]);
-        setForm({ patient: '', amount: '' });
+        const selected = patients.find(p => (p.uid || p.docId) === form.patientId);
+        const patientName = selected ? (selected.name || 'Unknown') : 'Unknown';
+
+        const invoiceData = {
+          patientId: form.patientId,       // uid (auth) – patient isi se dekh sakta hai
+          patientName: patientName,
+          amount: form.amount,
+          status: 'Unpaid',
+          createdAt: serverTimestamp()
+        };
+
+        const docRef = await addDoc(collection(db, 'invoices'), invoiceData);
+
+        setInvoices([...invoices, { id: docRef.id, ...invoiceData, createdAt: new Date() }]);
+        setForm({ patientId: '', amount: '' });
+        alert("Bill generated successfully!");
       } catch (error) { alert("Error generating bill: " + error.message); }
       finally { setLoading(false); }
     }
@@ -47,8 +76,8 @@ const ReceptionistBilling = ({ navigateTo }) => {
         .card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; max-width: 500px; }
         .form-group { margin-bottom: 18px; }
         label { display: block; font-weight: 600; font-size: 14px; color: #334155; margin-bottom: 5px; }
-        input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; transition: 0.2s; background: #f8fafc; }
-        input:focus { border-color: #3b82f6; outline: none; background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; transition: 0.2s; background: #f8fafc; }
+        input:focus, select:focus { border-color: #3b82f6; outline: none; background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
         .error { color: #ef4444; font-size: 12px; margin-top: 5px; display: block; }
         .btn { background: #3b82f6; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 700; font-size: 15px; transition: 0.2s; }
         .btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.3); }
@@ -67,11 +96,43 @@ const ReceptionistBilling = ({ navigateTo }) => {
         <button className="back-btn" onClick={() => navigateTo('receptionist-overview')}>← Back to Dashboard</button>
         <h1>Billing</h1>
         <div className="card"><form onSubmit={handleSubmit}>
-          <div className="form-group"><label>Patient Name</label><input value={form.patient} onChange={(e) => setForm({...form, patient: e.target.value})} placeholder="John Doe" />{errors.patient && <span className="error">{errors.patient}</span>}</div>
-          <div className="form-group"><label>Amount</label><input type="number" value={form.amount} onChange={(e) => setForm({...form, amount: e.target.value})} placeholder="5000" />{errors.amount && <span className="error">{errors.amount}</span>}</div>
+          <div className="form-group">
+            <label>Select Patient</label>
+            <select value={form.patientId} onChange={(e) => setForm({...form, patientId: e.target.value})}>
+              <option value="">--Select Patient--</option>
+              {patients.map((p) => (
+                <option key={p.docId} value={p.uid || p.docId}>
+                  {p.name || 'Unnamed'} {p.phone ? `(${p.phone})` : ''}
+                </option>
+              ))}
+            </select>
+            {errors.patientId && <span className="error">{errors.patientId}</span>}
+          </div>
+          <div className="form-group">
+            <label>Amount</label>
+            <input type="number" value={form.amount} onChange={(e) => setForm({...form, amount: e.target.value})} placeholder="5000" />
+            {errors.amount && <span className="error">{errors.amount}</span>}
+          </div>
           <button type="submit" className="btn" disabled={loading}>{loading ? 'Generating...' : 'Generate Bill'}</button>
         </form></div>
-        <div className="table">{invoices.length === 0 ? <div className="empty">No bills generated.</div> : <table><thead><tr><th>Patient</th><th>Amount</th><th>Status</th></tr></thead><tbody>{invoices.map((inv) => <tr key={inv.id}><td><strong>{inv.patient}</strong></td><td>${inv.amount}</td><td className={inv.status === 'Unpaid' ? 'status-unpaid' : 'status-paid'}>{inv.status}</td></tr>)}</tbody></table>}</div>
+        <div className="table">
+          {invoices.length === 0 ? (
+            <div className="empty">No bills generated.</div>
+          ) : (
+            <table>
+              <thead><tr><th>Patient</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody>
+                {invoices.map((inv) => (
+                  <tr key={inv.id}>
+                    <td><strong>{inv.patientName || inv.patient || 'Unknown'}</strong></td>
+                    <td>${inv.amount}</td>
+                    <td className={inv.status === 'Unpaid' ? 'status-unpaid' : 'status-paid'}>{inv.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
     </>
   );

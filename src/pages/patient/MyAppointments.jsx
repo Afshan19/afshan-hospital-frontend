@@ -11,8 +11,7 @@ const MyAppointments = ({ navigateTo }) => {
       try {
         const q = query(collection(db, 'appointments'), where('patientId', '==', auth.currentUser.uid));
         const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setAppointments(data);
+        setAppointments(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       } catch (error) {
         console.error("Error fetching appointments:", error);
       } finally {
@@ -50,7 +49,12 @@ const MyAppointments = ({ navigateTo }) => {
         <button className="back-btn" onClick={() => navigateTo('patient-overview')}>← Back to Dashboard</button>
         <h1>My Appointments</h1>
         <div className="table">
-          {loading ? <div className="empty">Loading...</div> : appointments.length === 0 ? <div className="empty">No appointments booked yet.</div> : <table><thead><tr><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th></tr></thead><tbody>{appointments.map((d) => <tr key={d.id}><td><strong>{d.doctor}</strong></td><td>{d.date}</td><td>{d.time}</td><td><span className="status-badge" style={{background: getStatusColor(d.status)}}>{d.status || 'Scheduled'}</span></td></tr>)}</tbody></table>}
+          {loading ? <div className="empty">Loading...</div> : appointments.length === 0 ? <div className="empty">No appointments booked yet.</div> : (
+            <table>
+              <thead><tr><th>Doctor</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th></tr></thead>
+              <tbody>{appointments.map((d) => <tr key={d.id}><td><strong>{d.doctor || '—'}</strong></td><td>{d.date}</td><td>{d.time}</td><td>{d.reason || '—'}</td><td><span className="status-badge" style={{background: getStatusColor(d.status)}}>{d.status || 'Scheduled'}</span></td></tr>)}</tbody>
+            </table>
+          )}
         </div>
       </div>
     </>
