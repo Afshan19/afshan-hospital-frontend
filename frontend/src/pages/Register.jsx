@@ -2,11 +2,12 @@
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase'; // Firebase import
+import { auth, db } from '../firebase';
 
 const RegisterScreen = ({ navigateTo }) => {
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', password: '', confirmPassword: '', role: 'Patient'
+    name: '', email: '', phone: '', password: '', confirmPassword: '', role: 'Patient',
+    license: '', specialization: ''
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,12 @@ const RegisterScreen = ({ navigateTo }) => {
     else if (formData.password.length < 6) errs.password = "Password must be at least 6 characters";
     if (!formData.confirmPassword) errs.confirmPassword = "Confirm Password is required";
     else if (formData.password !== formData.confirmPassword) errs.confirmPassword = "Passwords do not match";
+
+    // Doctor-specific validation
+    if (formData.role === 'Doctor') {
+      if (!formData.license) errs.license = "Medical License Number is required";
+      if (!formData.specialization) errs.specialization = "Specialization is required";
+    }
     return errs;
   };
 
@@ -32,24 +39,32 @@ const RegisterScreen = ({ navigateTo }) => {
     if (Object.keys(errs).length === 0) {
       setLoading(true);
       try {
-        // 1. Firebase Auth mein User Create Karein
         const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
         const user = userCredential.user;
 
-        // 2. Firestore Database mein User ka Data Save Karein
+        // Save user data
         await addDoc(collection(db, 'patients'), {
           uid: user.uid,
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
           role: formData.role,
+          // Doctor fields
+          ...(formData.role === 'Doctor' && {
+            license: formData.license,
+            specialization: formData.specialization,
+            status: 'Pending' // Admin approval required
+          }),
           createdAt: new Date()
         });
 
-        // 3. Naam localStorage mein save karein (Dashboard par show karne ke liye)
         localStorage.setItem('userName', formData.name);
 
-        alert('Registration successful! Please login now.');
+        if (formData.role === 'Doctor') {
+          alert('Registration successful! Your account is pending Admin approval. Please wait for verification before logging in.');
+        } else {
+          alert('Registration successful! Please login now.');
+        }
         navigateTo('login');
       } catch (error) {
         alert('Registration failed: ' + error.message);
@@ -102,6 +117,8 @@ const RegisterScreen = ({ navigateTo }) => {
         .auth-link { text-align: center; margin-top: 15px; font-size: 13px; color: #555; }
         .auth-link a { color: #667eea; text-decoration: none; font-weight: 700; cursor: pointer; }
         .auth-link a:hover { text-decoration: underline; }
+
+        .doctor-note { background: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 8px; font-size: 12px; margin-top: 8px; border-left: 3px solid #f59e0b; }
       `}</style>
 
       <div className="register-wrapper">
@@ -129,13 +146,33 @@ const RegisterScreen = ({ navigateTo }) => {
             </div>
             <div className="form-group">
               <label>Role</label>
-              <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})}>
+              <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value, license: '', specialization: ''})}>
                 <option>Patient</option>
                 <option>Doctor</option>
                 <option>Nurse</option>
                 <option>Receptionist</option>
               </select>
             </div>
+
+            {/* Doctor-only fields */}
+            {formData.role === 'Doctor' && (
+              <>
+                <div className="form-group">
+                  <label>Medical License Number</label>
+                  <input type="text" value={formData.license} onChange={(e) => setFormData({...formData, license: e.target.value})} placeholder="e.g., PMC-12345" />
+                  {errors.license && <span className="error">{errors.license}</span>}
+                </div>
+                <div className="form-group">
+                  <label>Specialization</label>
+                  <input type="text" value={formData.specialization} onChange={(e) => setFormData({...formData, specialization: e.target.value})} placeholder="e.g., Cardiology" />
+                  {errors.specialization && <span className="error">{errors.specialization}</span>}
+                </div>
+                <div className="doctor-note">
+                  ⚠️ Doctor accounts require Admin verification. You cannot log in until approved.
+                </div>
+              </>
+            )}
+
             <div className="form-group">
               <label>Password</label>
               <input type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} placeholder="********" />

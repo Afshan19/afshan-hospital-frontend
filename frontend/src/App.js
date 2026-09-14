@@ -24,6 +24,7 @@ import PatientCheckIn from './pages/nurse/PatientCheckIn';
 import PatientInformation from './pages/nurse/PatientInformation';
 
 // Admin Module
+import DoctorVerification from './pages/admin/DoctorVerification';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageUsers from './pages/admin/ManageUsers';
 import ManageDoctors from './pages/admin/ManageDoctors';
@@ -126,6 +127,7 @@ function App() {
   if (page === 'nurse-info') return renderDashboard('Nurse', page, PatientInformation);
 
   // Admin
+  if (page === 'admin-verify-doctors') return renderDashboard('Admin', page, DoctorVerification);
   if (page === 'admin-overview') return renderDashboard('Admin', page, AdminDashboard);
   if (page === 'admin-users') return renderDashboard('Admin', page, ManageUsers);
   if (page === 'admin-doctors') return renderDashboard('Admin', page, ManageDoctors);
@@ -152,7 +154,6 @@ function App() {
   if (page === 'receptionist-checkin') return renderDashboard('Receptionist', page, ReceptionistCheckIn);
   if (page === 'receptionist-billing') return renderDashboard('Receptionist', page, ReceptionistBilling);
 
-  return <div>404 Not Found</div>;
-}
+return <div style={{padding: '50px', fontSize: '20px', color: 'red'}}>404 - Current page state is: <strong>{page}</strong></div>;}
 
 export default App;

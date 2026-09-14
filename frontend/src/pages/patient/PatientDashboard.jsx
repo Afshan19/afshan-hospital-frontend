@@ -4,8 +4,8 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const PatientDashboard = ({ navigateTo, userName }) => {
   const [displayName, setDisplayName] = useState(userName || 'Patient');
-  const [isLoadingUser, setIsLoadingUser] = useState(true);
-
+  
+const [isLoadingUser, setIsLoadingUser] = useState(true);
   useEffect(() => {
     const fetchUserName = async () => {
       if (auth.currentUser) {

@@ -5,7 +5,10 @@ const DashboardLayout = ({ role, activeRoute, navigateTo, onLogout, children }) 
 
   const menus = {
     Admin: [
+
       { label: 'Dashboard / Overview', icon: '📊', route: 'admin-overview' },
+                  { label: 'Doctor Verification', icon: '🩺', route: 'admin-verify-doctors' },
+
       { label: 'Manage Users', icon: '👥', route: 'admin-users' },
       { label: 'Manage Doctors', icon: '👨‍⚕️', route: 'admin-doctors' },
       { label: 'Manage Patients', icon: '🛌', route: 'admin-patients' },
